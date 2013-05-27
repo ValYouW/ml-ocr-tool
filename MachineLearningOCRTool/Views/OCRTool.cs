@@ -34,6 +34,22 @@ namespace MachineLearningOCRTool.Views
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.DoubleBuffer | ControlStyles.ResizeRedraw, true);
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             Common.SetDoubleBuffered(pictureBox1);
+
+            if(!string.IsNullOrEmpty(Properties.Settings.Default.InputImage))
+            {
+                txtFile.Text = Properties.Settings.Default.InputImage;
+            }
+
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.ModelParams))
+            {
+                txtModelParams.Text = Properties.Settings.Default.ModelParams;
+            }
+
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.OutputFile))
+            {
+                txtOutput.Text = Properties.Settings.Default.OutputFile;
+            }
+
         }
 
         #region Methods
@@ -221,6 +237,12 @@ namespace MachineLearningOCRTool.Views
 
         private void ExportBlobs()
         {
+            if (string.IsNullOrEmpty(txtOutput.Text) || txtOutput.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            {
+                MessageBox.Show("Invalid output file name.");
+                return;
+            }
+
             if (txtExtractedBackColor.Value == 0)
             {
                 DialogResult dr = MessageBox.Show("Extraction back color is black, do you want to continue with that?", "Extract Back Color", MessageBoxButtons.YesNo);
@@ -245,6 +267,10 @@ namespace MachineLearningOCRTool.Views
                     return;
                 }
             }
+
+            // Save the output file name.
+            Properties.Settings.Default.OutputFile = txtOutput.Text;
+            Properties.Settings.Default.Save();
 
             using (StreamWriter sw = new StreamWriter(txtOutput.Text))
             {
@@ -469,6 +495,8 @@ namespace MachineLearningOCRTool.Views
             if (dr == DialogResult.OK)
             {
                 txtFile.Text = openFileDialog1.FileName;
+                Properties.Settings.Default.InputImage = openFileDialog1.FileName;
+                Properties.Settings.Default.Save();
             }
         }
 
@@ -479,6 +507,8 @@ namespace MachineLearningOCRTool.Views
             if (dr == DialogResult.OK)
             {
                 txtModelParams.Text = openFileDialog1.FileName;
+                Properties.Settings.Default.ModelParams = openFileDialog1.FileName;
+                Properties.Settings.Default.Save();
             }
         }
 

@@ -67,9 +67,9 @@
             this.label10 = new System.Windows.Forms.Label();
             this.btnOpenModelFile = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.txtExportSize = new System.Windows.Forms.NumericUpDown();
-            this.label12 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
@@ -87,7 +87,7 @@
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.InitialDirectory = "c:\\temp";
+            this.openFileDialog1.InitialDirectory = "c:\\";
             // 
             // btnOpenFile
             // 
@@ -105,7 +105,6 @@
             this.txtFile.Name = "txtFile";
             this.txtFile.Size = new System.Drawing.Size(193, 20);
             this.txtFile.TabIndex = 1;
-            this.txtFile.Text = "C:\\temp\\MyHandWriting.jpg";
             this.toolTip1.SetToolTip(this.txtFile, "Image to load and analyze.");
             // 
             // pictureBox1
@@ -470,7 +469,6 @@
             this.txtOutput.Name = "txtOutput";
             this.txtOutput.Size = new System.Drawing.Size(156, 20);
             this.txtOutput.TabIndex = 24;
-            this.txtOutput.Text = "C:\\temp\\MyHandWriting.txt";
             // 
             // btnPredict
             // 
@@ -490,7 +488,6 @@
             this.txtModelParams.Name = "txtModelParams";
             this.txtModelParams.Size = new System.Drawing.Size(193, 20);
             this.txtModelParams.TabIndex = 28;
-            this.txtModelParams.Text = "C:\\temp\\LearnedParams.txt";
             // 
             // label9
             // 
@@ -546,6 +543,17 @@
             this.toolTip1.InitialDelay = 500;
             this.toolTip1.ReshowDelay = 100;
             // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 24);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(96, 13);
+            this.label12.TabIndex = 35;
+            this.label12.Text = "Export Size (W/H):";
+            this.toolTip1.SetToolTip(this.label12, "The exported image size (the exported image is\r\nalways a square, so this is the w" +
+        "idth & height).");
+            // 
             // label11
             // 
             this.label11.AutoSize = true;
@@ -577,17 +585,6 @@
             0,
             0,
             0});
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 24);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(96, 13);
-            this.label12.TabIndex = 35;
-            this.label12.Text = "Export Size (W/H):";
-            this.toolTip1.SetToolTip(this.label12, "The exported image size (the exported image is\r\nalways a square, so this is the w" +
-        "idth & height).");
             // 
             // groupBox2
             // 
