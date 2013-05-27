@@ -8,3 +8,6 @@ More specifically, this tool gets a image with letters, and automatically export
 that can be imported into Octave to run some learning algorithm on.
 Then this tool can read a Logistic Regression Model parameters, and run it on another image
 to try and identify the letters.
+
+A detailed explanation video on YouTube here:
+http://www.youtube.com/watch?v=7uc05vyjVuw
