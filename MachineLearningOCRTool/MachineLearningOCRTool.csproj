@@ -57,7 +57,7 @@
   <ItemGroup>
     <Reference Include="AForge, Version=2.2.0.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\AForge.dll</HintPath>
+      <HintPath>..\3rdParty\AForge.dll</HintPath>
     </Reference>
     <Reference Include="AForge.Imaging">
       <HintPath>..\3rdParty\AForge.Imaging.dll</HintPath>
