@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace MachineLearningOCRTool
 {   
@@ -28,6 +29,11 @@ namespace MachineLearningOCRTool
                         System.Reflection.BindingFlags.Instance);
 
             aProp.SetValue(c, true, null);
+        }
+
+        public static int GetColorAverage(Color color)
+        {
+            return (color.R + color.G + color.B)/3;
         }
     }
 }

@@ -211,8 +211,11 @@ namespace MachineLearningOCRTool.Views
         {
             BlobPanel blobPanel = new BlobPanel();
             blobPanel.RowIndex = row;
-            blobPanel.Location = new Point(rectangle.X - 2, rectangle.Y - 2);
-            blobPanel.Size = new Size(rectangle.Width + 4, rectangle.Height + 4);
+            //blobPanel.Location = new Point(rectangle.X - 2, rectangle.Y - 2);
+            //blobPanel.Size = new Size(rectangle.Width + 4, rectangle.Height + 4);
+            rectangle.Inflate(3,3);
+            blobPanel.Location = new Point(rectangle.X, rectangle.Y);
+            blobPanel.Size = new Size(rectangle.Width, rectangle.Height);
             blobPanel.SelectedChanged += blobPanel_SelectedChanged;
             blobPanel.DeleteRequest += blobPanel_DeleteRequest;
 
@@ -237,9 +240,9 @@ namespace MachineLearningOCRTool.Views
 
         private void ExportBlobs()
         {
-            if (string.IsNullOrEmpty(txtOutput.Text) || txtOutput.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            if (string.IsNullOrEmpty(txtOutput.Text))
             {
-                MessageBox.Show("Invalid output file name.");
+                MessageBox.Show("Please enter an output file name.");
                 return;
             }
 
@@ -354,7 +357,7 @@ namespace MachineLearningOCRTool.Views
                 for (int j = 0; j < newImage.Width; j++)
                 {
                     Color pixel = newImage.GetPixel(i, j);
-                    sw.Write(pixel.R + ",");
+                    sw.Write(Common.GetColorAverage(pixel) + ",");
                 }
             }
 
@@ -372,22 +375,33 @@ namespace MachineLearningOCRTool.Views
                 return;
             }
 
+            // Check if the user forgot to choose the back color.
+            if (txtExtractedBackColor.Value == 0)
+            {
+                DialogResult dr = MessageBox.Show("Extraction back color is black, do you want to continue with prediction?", "Back Color", MessageBoxButtons.YesNo);
+                if (dr == DialogResult.No)
+                    return;
+            }
+
             // Get the model params.
             Matrix thetas = GetModelParamsFromFile();
 
             // Loop thru all blobs and predict.
             foreach (BlobPanel blob in pictureBox1.Controls.OfType<BlobPanel>())
             {
+                // Reset the blob's description.
+                blob.Description = string.Empty;
+
                 // Get the blob pixels.
                 Vector xs = GetBlobPixels(blob);
 
                 // Get the model value (this is what to be used in the Sigmoid function).
                 var v = (thetas * xs);
-                
+
                 // This is for finding the maximum value of all letters predictions (1-vs-all), so
                 // we know what letter to choose.
-                double max = double.MinValue;
-                int maxIndex = -1;
+                double[] max = new double[3];
+                int[] maxIndex = {-1, -1, -1};
                 
                 // Loop thru the values
                 for (int i = 0; i < v.Count; i++)
@@ -395,16 +409,28 @@ namespace MachineLearningOCRTool.Views
                     // Get the final model prediction (Sigmoid).
                     v[i] = SpecialFunctions.Logistic(v[i].Real);
 
-                    // Check if this is the maximum prediction.
-                    if (v[i].Real > max)
+                    // Check if this prediction is in the "top 3".
+                    for (int j = 0; j < max.Length; j++)
                     {
-                        max = v[i].Real;
-                        maxIndex = i;
+                        if (v[i].Real > max[j])
+                        {
+                            max[j] = v[i].Real;
+                            maxIndex[j] = i;
+                            
+                            // We want to kepp max array sorted, so once we found a value
+                            // it is bigger than we stop.
+                            break;
+                        }
                     }
                 }
 
+                // Put the "top 3" in the description.
+                blob.Description += Common.Letters[maxIndex[0]] + " - " + max[0].ToString() + "\n";
+                blob.Description += Common.Letters[maxIndex[1]] + " - " + max[1].ToString() + "\n";
+                blob.Description += Common.Letters[maxIndex[2]] + " - " + max[2].ToString() + "\n";
+
                 // Save the selected letter in the blob.
-                blob.Value = Common.Letters[maxIndex];
+                blob.Title = Common.Letters[maxIndex[0]];
             }
 
             pictureBox1.Invalidate();
@@ -490,6 +516,11 @@ namespace MachineLearningOCRTool.Views
 
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
+            if (!string.IsNullOrEmpty(txtFile.Text))
+            {
+                openFileDialog1.InitialDirectory = Path.GetDirectoryName(txtFile.Text);
+            }
+            
             openFileDialog1.Filter = "JPG|*.jpg|BMP|*.bmp";
             DialogResult dr = openFileDialog1.ShowDialog();
             if (dr == DialogResult.OK)
@@ -502,6 +533,11 @@ namespace MachineLearningOCRTool.Views
 
         private void btnOpenModelFile_Click(object sender, EventArgs e)
         {
+            if (!string.IsNullOrEmpty(txtModelParams.Text))
+            {
+                openFileDialog1.InitialDirectory = Path.GetDirectoryName(txtModelParams.Text);
+            }
+
             openFileDialog1.Filter = "Text|*.txt";
             DialogResult dr = openFileDialog1.ShowDialog();
             if (dr == DialogResult.OK)
@@ -573,10 +609,10 @@ namespace MachineLearningOCRTool.Views
 
                     row.Panles.ForEach(panel =>
                         {
-                            if (string.IsNullOrEmpty(panel.Value))
+                            if (string.IsNullOrEmpty(panel.Title))
                                 return;
 
-                            e.Graphics.DrawString(panel.Value, Font, new SolidBrush(Color.Red), panel.Left + panel.Width/2, panel.Top - 15);
+                            e.Graphics.DrawString(panel.Title, Font, new SolidBrush(Color.Red), panel.Left + panel.Width / 2, panel.Top - 15);
                         });
                 });
         }
@@ -626,11 +662,16 @@ namespace MachineLearningOCRTool.Views
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    sumColor += ((Bitmap)pictureBox1.Image).GetPixel(mouse.X + j, mouse.Y + i).R;
+                    sumColor += Common.GetColorAverage(((Bitmap)pictureBox1.Image).GetPixel(mouse.X + j, mouse.Y + i));
                 }
             }
 
             txtExtractedBackColor.Value = sumColor / 9;
+
+            pictureBox1.Controls.OfType<BlobPanel>().ForEach(p => p.Selected = false);
+            m_selectedBlobs.Clear();
+            UpdateSelectedCount();
+            pictureBox1.Invalidate();
         }
 
         private void btnPredict_Click(object sender, EventArgs e)

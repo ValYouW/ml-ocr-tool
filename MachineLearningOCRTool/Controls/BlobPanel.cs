@@ -12,14 +12,24 @@ namespace MachineLearningOCRTool.Controls
         public event EventHandler DeleteRequest;
 
         private bool m_resize;
+        private string m_description;
 
         #endregion
 
         #region Properties
         
-        public bool Selected { get; private set; }
+        public bool Selected { get; set; }
         public int RowIndex { get; set; }
-        public string Value { get; set; }
+        public string Title { get; set; }
+        public string Description
+        {
+            get { return m_description; }
+            set 
+            {
+                m_description = value;
+                toolTip1.SetToolTip(this, m_description);
+            }
+        }
 
         #endregion
 
