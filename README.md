@@ -10,4 +10,4 @@ Then this tool can read a Logistic Regression Model parameters, and run it on an
 to try and identify the letters.
 
 A detailed explanation video on YouTube here:
-http://www.youtube.com/watch?v=7uc05vyjVuw
+https://youtu.be/o8DVk8Cl8jY
